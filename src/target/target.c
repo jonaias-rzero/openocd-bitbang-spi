@@ -1181,7 +1181,7 @@ int target_run_read_async_algorithm(struct target *target,
 	uint32_t rp = fifo_start_addr;
 
 	/* validate block_size is 2^n */
-	assert(IS_PWR_OF_2(block_size));
+	assert(!block_size || !(block_size & (block_size - 1)));
 
 	retval = target_write_u32(target, wp_addr, wp);
 	if (retval != ERROR_OK)
@@ -1210,7 +1210,7 @@ int target_run_read_async_algorithm(struct target *target,
 		}
 
 		LOG_DEBUG("offs 0x%zx count 0x%" PRIx32 " wp 0x%" PRIx32 " rp 0x%" PRIx32,
-			(size_t)(buffer - buffer_orig), count, wp, rp);
+			(size_t) (buffer - buffer_orig), count, wp, rp);
 
 		if (wp == 0) {
 			LOG_ERROR("flash read algorithm aborted by target");
@@ -1218,7 +1218,7 @@ int target_run_read_async_algorithm(struct target *target,
 			break;
 		}
 
-		if (!IS_ALIGNED(wp - fifo_start_addr, block_size) || wp < fifo_start_addr || wp >= fifo_end_addr) {
+		if (((wp - fifo_start_addr) & (block_size - 1)) || wp < fifo_start_addr || wp >= fifo_end_addr) {
 			LOG_ERROR("corrupted fifo write pointer 0x%" PRIx32, wp);
 			break;
 		}

@@ -26,7 +26,7 @@
  *
  * buffer contents is supposed to be returned in ***host*** endianness */
 typedef int (*read_sfdp_block_t)(struct flash_bank *bank, uint32_t addr,
-	uint32_t words, uint32_t *buffer);
+		uint32_t words, uint32_t *buffer);
 
 extern int spi_sfdp(struct flash_bank *bank, struct flash_device *dev,
 	read_sfdp_block_t read_sfdp_block);

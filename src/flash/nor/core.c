@@ -739,7 +739,7 @@ static bool flash_write_check_gap(struct flash_bank *bank,
 
 
 int flash_write_unlock_verify(struct target *target, struct image *image,
-	uint32_t *written, bool erase, bool unlock, bool write, bool verify)
+	uint32_t *written, int erase, bool unlock, bool write, bool verify)
 {
 	int retval = ERROR_OK;
 
@@ -754,7 +754,7 @@ int flash_write_unlock_verify(struct target *target, struct image *image,
 	if (written)
 		*written = 0;
 
-	if (erase) {
+	if (erase && write) {
 		/* assume all sectors need erasing - stops any problems
 		 * when flash_write is called multiple times */
 
@@ -962,10 +962,10 @@ int flash_write_unlock_verify(struct target *target, struct image *image,
 
 		retval = ERROR_OK;
 
-		if (unlock)
+		if (unlock && write)
 			retval = flash_unlock_address_range(target, run_address, run_size);
 		if (retval == ERROR_OK) {
-			if (erase) {
+			if (erase && write) {
 				/* calculate and erase sectors */
 				retval = flash_erase_address_range(target,
 						true, run_address, run_size);
